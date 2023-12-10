@@ -92,19 +92,38 @@ class MaxPooling:
             return self.result
 
 
+
+class Softmax:
+    def __init__(self, input, nodes):
+        self.input = input
+        self.nodes = nodes
+
+        self.flatten = self.input.flatten()
+        self.weights = np.random.randn(self.flatten.shape[0]) / self.flatten.shape[0]
+        self.bias = np.random.randn(nodes)
+
+    def operate(self):
+        total = np.dot(self.flatten, self.weights) + self.bias
+        exp = np.exp(total)
+        return exp/sum(exp)
+
+
+
 img_gray_conv2d = Conv2d(img_gray, 16 ,3,padding=0 , stride=1).operate()
 img_gray_conv2d_relu = Relu(img_gray_conv2d).operate()
 img_gray_conv2d_leakyrelu = LeakyRelu(img_gray_conv2d).operate()
+img_gray_conv2d_relu_maxpooling = MaxPooling(img_gray_conv2d_relu, 3).operate()
 
-# img_gray_conv2d_relu_maxpooling = MaxPooling(img_gray_conv2d_relu, 3).operate()
+softmax = Softmax(img_gray_conv2d_relu_maxpooling, 10)
+print(softmax.operate())
 
-fig = plt.figure(figsize=(10,10))
-
-for i in range(16):
-    plt.subplot(4,4, i+1)
-    plt.imshow(img_gray_conv2d_leakyrelu[:,:,i], cmap="gray")
-    plt.axis('off')
-
-# plt.savefig('img_gray_conv2d_relu_maxpooling.jpg')
-plt.show()
+# fig = plt.figure(figsize=(10,10))
+#
+# for i in range(16):
+#     plt.subplot(4,4, i+1)
+#     plt.imshow(img_gray_conv2d_leakyrelu[:,:,i], cmap="gray")
+#     plt.axis('off')
+#
+# # plt.savefig('img_gray_conv2d_relu_maxpooling.jpg')
+# plt.show()
 
